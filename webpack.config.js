@@ -38,10 +38,11 @@ module.exports = {
     new CopyWebpackPlugin([
       { from: './node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js', to: 'libs/VSS.SDK.min.js' },
       { from: './src/*.html', to: './' },
-      { from: './marketplace', to: 'marketplace' },
       { from: './vss-extension.json', to: 'vss-extension-release.json' },
       { from: './configs/release.json', to: 'release.json' },
-      { from: './LICENSE.md', to: 'LICENSE.md' }
+      { from: './LICENSE.md', to: 'LICENSE.md' },
+      { from: './README.md', to: 'README.md' },
+      { from: './marketplace', to: 'marketplace' }
     ])
   ]
 }

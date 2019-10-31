@@ -1,5 +1,5 @@
 {
-  "public": true,
+  "public": false,
   "files": [
     {
       "path": "src",
@@ -7,10 +7,6 @@
     },
     {
       "path": "libs",
-      "addressable": true
-    },
-    {
-      "path": "marketplace",
       "addressable": true
     }
   ]

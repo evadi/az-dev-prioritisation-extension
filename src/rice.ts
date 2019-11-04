@@ -24,31 +24,46 @@ function getWorkItemFormService() {
   return WorkItemFormService.getService();
 }
 
-function updateRICEScoreOnForm(storedFields: IStoredFieldReferences) {
+function updatePrioritisationScoreOnForm(storedFields: IStoredFieldReferences) {
   getWorkItemFormService()
     .then((service) => {
       service.getFields()
         .then((fields: Contracts.WorkItemField[]) => {
-          const matchingReachValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.reachField);
-          const matchingImpactValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.impactField);
-          const matchingConfidenceValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.confidenceField);
-          const matchingEffortValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.effortField);
-          const matchingRICEScoreValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.riceScoreField);
+          const matchingAnsoffProcutValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.ansoffProductField);
+          const matchingAnsoffMarketValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.ansoffMarketField);
+          const matchingAnsoffScoreValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.ansoffScoreField);
+          const matchingGEAttrValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.geAttractivenessField);
+          const matchingGEBusinessStrengthValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.geBusinessStrengthField);
+          const matchingGEScoreValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.geScoreField);
+          const matchingRiskLiklihoodValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.riskLiklihoodField);
+          const matchingRiskConsequencesValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.riskConsequencesField);
+          const matchingRiskScoreValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.riskScoreField);
 
-          if (matchingReachValueFields.length > 0 && matchingImpactValueFields.length > 0 && matchingConfidenceValueFields.length > 0 && matchingEffortValueFields.length > 0 && matchingRICEScoreValueFields.length > 0) {
-            service.getFieldValues([storedFields.reachField, storedFields.impactField, storedFields.confidenceField, storedFields.effortField])
+          if (matchingAnsoffProcutValueFields.length > 0 && matchingAnsoffMarketValueFields.length > 0 && 
+            matchingAnsoffScoreValueFields.length > 0 && matchingGEAttrValueFields.length > 0 && 
+            matchingGEBusinessStrengthValueFields.length > 0 && matchingGEScoreValueFields.length > 0 &&
+            matchingRiskLiklihoodValueFields.length > 0 && matchingRiskConsequencesValueFields.length > 0 &&
+            matchingRiskScoreValueFields.length > 0) {
+            service.getFieldValues([storedFields.ansoffMarketField, storedFields.ansoffProductField, storedFields.ansoffScoreField, storedFields.geAttractivenessField, storedFields.geBusinessStrengthField, storedFields.geScoreField, storedFields.riskConsequencesField, storedFields.riskLiklihoodField, storedFields.riskScoreField])
               .then((values) => {
-                const reachValue = +values[storedFields.reachField];
-                const impactValue = +values[storedFields.impactField];
-                const confidenceValue = +values[storedFields.confidenceField];
-                const effortValue = +values[storedFields.effortField];
+                const ansoffMarketValue = +values[storedFields.ansoffMarketField];
+                const ansoffProductValue = +values[storedFields.ansoffProductField];
+                const ansoffScoreValue = +values[storedFields.ansoffScoreField];
 
-                let rice = 0;
-                if (effortValue > 0) {
-                  rice = (reachValue * impactValue * confidenceValue) / effortValue;
-                }
+                const geAttractivenessValue = +values[storedFields.geAttractivenessField];
+                const geBuinessStrengthValue = +values[storedFields.geBusinessStrengthField];
+                const geScoreValue = +values[storedFields.geScoreField];
 
-                service.setFieldValue(storedFields.riceScoreField, rice);
+                const riskLiklihoodValue = +values[storedFields.riskLiklihoodField];
+                const riskConsequencesValue = +values[storedFields.riskConsequencesField];
+                const riskScoreValue = +values[storedFields.riskScoreField];
+
+                let priorityScore = 0;
+                // if (effortValue > 0) {
+                //   rice = (reachValue * impactValue * confidenceValue) / effortValue;
+                // }
+
+                service.setFieldValue(storedFields.businessValueField, priorityScore);
               });
           }
         });
@@ -60,12 +75,16 @@ const formObserver = () => {
     onFieldChanged: (args) => {
       GetStoredFields()
         .then((storedFields: IStoredFieldReferences) => {
-          if (storedFields && storedFields.reachField && storedFields.impactField && storedFields.confidenceField && storedFields.effortField && storedFields.riceScoreField) {
-            if (!args.changedFields[storedFields.reachField] || !args.changedFields[storedFields.impactField] || !args.changedFields[storedFields.confidenceField] || !args.changedFields[storedFields.effortField]) {
-              updateRICEScoreOnForm(storedFields);
+          if (storedFields && storedFields.ansoffMarketField && storedFields.ansoffProductField && storedFields.ansoffScoreField && 
+            storedFields.geAttractivenessField && storedFields.geBusinessStrengthField && storedFields.geScoreField && 
+            storedFields.riskLiklihoodField && storedFields.riskConsequencesField && storedFields.riskScoreField) {
+            if (!args.changedFields[storedFields.ansoffMarketField] || !args.changedFields[storedFields.ansoffProductField] || !args.changedFields[storedFields.ansoffScoreField] || 
+              !args.changedFields[storedFields.geAttractivenessField] || !args.changedFields[storedFields.geBusinessStrengthField] || !args.changedFields[storedFields.geScoreField] ||
+                !args.changedFields[storedFields.riskLiklihoodField] || !args.changedFields[storedFields.riskConsequencesField] || !args.changedFields[storedFields.riskScoreField]) {
+              updatePrioritisationScoreOnForm(storedFields);
             }
           } else {
-            console.log('Unable to calculate RICE Score, please configure fields on the collection settings page.');
+            console.log('Unable to calculate Prioritisation Score, please configure fields on the collection settings page.');
           }
         }, (reason) => {
           console.log(reason);
@@ -75,10 +94,12 @@ const formObserver = () => {
     onLoaded: () => {
       GetStoredFields()
         .then((storedFields: IStoredFieldReferences) => {
-          if (storedFields && storedFields.reachField && storedFields.impactField && storedFields.confidenceField && storedFields.effortField && storedFields.riceScoreField) {
-            updateRICEScoreOnForm(storedFields);
+          if (storedFields && storedFields.ansoffMarketField && storedFields.ansoffProductField && storedFields.ansoffScoreField && 
+            storedFields.geAttractivenessField && storedFields.geBusinessStrengthField && storedFields.geScoreField && 
+            storedFields.riskLiklihoodField && storedFields.riskConsequencesField && storedFields.riskScoreField) {
+            updatePrioritisationScoreOnForm(storedFields);
           } else {
-            console.log('Unable to calculate RICE Score, please configure fields on the collection settings page.');
+            console.log('Unable to calculate Prioritisation Score, please configure fields on the collection settings page.');
           }
         }, (reason) => {
           console.log(reason);

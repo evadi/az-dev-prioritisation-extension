@@ -35,20 +35,35 @@ export class Settings {
     const riceContainer = $('#rice-settings');
     this.menuBar = Controls.create<Menus.MenuBar, any>(Menus.MenuBar, riceContainer, menubarOptions);
 
-    const reachContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
-    $('<label />').text('Reach Field').appendTo(reachContainer);
+    //Ansoff Fields
+    const ansoffProductContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
+    $('<label />').text('Ansoff Product Field').appendTo(ansoffProductContainer);
 
-    const impactContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
-    $('<label />').text('Impact Field').appendTo(impactContainer);
+    const ansoffMarketContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
+    $('<label />').text('Ansoff Market Field').appendTo(ansoffMarketContainer);
 
-    const confidenceContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
-    $('<label />').text('Confidence Field').appendTo(confidenceContainer);
+    const ansoffScoreContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
+    $('<label />').text('Ansoff Score Field').appendTo(ansoffScoreContainer);
 
-    const effortContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
-    $('<label />').text('Effort Field').appendTo(effortContainer);
+    //GE Fields
+    const geAttractivenessContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
+    $('<label />').text('GE Attractiveness Field').appendTo(geAttractivenessContainer);
 
-    const riceScoreContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
-    $('<label />').text('RICE Score Field').appendTo(riceScoreContainer);
+    const geBusinessStrengthContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
+    $('<label />').text('GE Business Strength Field').appendTo(geBusinessStrengthContainer);
+
+    const geScoreContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
+    $('<label />').text('GE Score Field').appendTo(geScoreContainer);
+
+    //Risk Field
+    const riskLiklihoodContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
+    $('<label />').text('Risk Liklihood Field').appendTo(riskLiklihoodContainer);
+
+    const riskConsequencesContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
+    $('<label />').text('Risk Consequences Field').appendTo(riskConsequencesContainer);
+
+    const riskScoreContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
+    $('<label />').text('Risk Score Field').appendTo(riskScoreContainer);
 
     VSS.getService<IExtensionDataService>(VSS.ServiceIds.ExtensionData)
       .then((dataService: IExtensionDataService) => {
@@ -58,20 +73,32 @@ export class Settings {
               this.selectedFields = storedFields;
             } else {
               this.selectedFields = {
-                reachField: null,
-                impactField: null,
-                confidenceField: null,
-                effortField: 'Microsoft.VSTS.Scheduling.Effort',
-                riceScoreField: 'Microsoft.VSTS.Common.BusinessValue'
+                ansoffProductField: null,
+                ansoffMarketField: null,
+                ansoffScoreField: null,
+                geAttractivenessField: null,
+                geBusinessStrengthField: null,
+                geScoreField: null,
+                riskLiklihoodField: null,
+                riskConsequencesField: null,
+                riskScoreField: null,
+                businessValueField: 'Microsoft.VSTS.Common.BusinessValue'
               };
             }
 
             this.getSortedFieldsList().then((fieldList) => {
-              Controls.create(Combo, reachContainer, this.getComboOptions('reachValue', fieldList, this.selectedFields.reachField));
-              Controls.create(Combo, impactContainer, this.getComboOptions('impactValue', fieldList, this.selectedFields.impactField));
-              Controls.create(Combo, confidenceContainer, this.getComboOptions('confidenceValue', fieldList, this.selectedFields.confidenceField));
-              Controls.create(Combo, effortContainer, this.getComboOptions('effortValue', fieldList, this.selectedFields.effortField));
-              Controls.create(Combo, riceScoreContainer, this.getComboOptions('riceScoreValue', fieldList, this.selectedFields.riceScoreField));
+              Controls.create(Combo, ansoffProductContainer, this.getComboOptions('ansoffProductValue', fieldList, this.selectedFields.ansoffProductField));
+              Controls.create(Combo, ansoffMarketContainer, this.getComboOptions('ansoffMarketValue', fieldList, this.selectedFields.ansoffMarketField));
+              Controls.create(Combo, ansoffScoreContainer, this.getComboOptions('ansoffScoreValue', fieldList, this.selectedFields.ansoffScoreField));
+              
+              Controls.create(Combo, geAttractivenessContainer, this.getComboOptions('geAttractivenessValue', fieldList, this.selectedFields.geAttractivenessField));
+              Controls.create(Combo, geBusinessStrengthContainer, this.getComboOptions('geBusinessStrengthValue', fieldList, this.selectedFields.geBusinessStrengthField));
+              Controls.create(Combo, geScoreContainer, this.getComboOptions('geScoreValue', fieldList, this.selectedFields.geScoreField));
+
+              Controls.create(Combo, riskLiklihoodContainer, this.getComboOptions('riskLiklihoodValue', fieldList, this.selectedFields.riskLiklihoodField));
+              Controls.create(Combo, riskConsequencesContainer, this.getComboOptions('riskConsequencesValue', fieldList, this.selectedFields.riskConsequencesField));
+              Controls.create(Combo, riskScoreContainer, this.getComboOptions('riskScoreValue', fieldList, this.selectedFields.riskScoreField));
+
               this.updateSaveButton();
 
               VSS.notifyLoadSucceeded();
@@ -114,19 +141,31 @@ export class Settings {
         const fieldReferenceName: string = (this.getSelectedIndex() < 0) ? null : that.getFieldReferenceName(fieldName);
 
         switch (this._id) {
-          case 'reachValue':
-            that.selectedFields.reachField = fieldReferenceName;
+          case 'ansoffProductValue':
+            that.selectedFields.ansoffProductField = fieldReferenceName;
             break;
-          case 'impactValue':
-            that.selectedFields.impactField = fieldReferenceName;
+          case 'ansoffMarketValue':
+            that.selectedFields.ansoffMarketField = fieldReferenceName;
             break;
-          case 'confidenceValue':
-            that.selectedFields.confidenceField = fieldReferenceName;
-          case 'effortValue':
-            that.selectedFields.effortField = fieldReferenceName;
+          case 'ansoffScoreValue':
+            that.selectedFields.ansoffScoreField = fieldReferenceName;
+          case 'geAttractivenessValue':
+            that.selectedFields.geAttractivenessField = fieldReferenceName;
             break;
-          case 'riceScoreValue':
-            that.selectedFields.riceScoreField = fieldReferenceName;
+          case 'geBusinessStrengthValue':
+            that.selectedFields.geBusinessStrengthField = fieldReferenceName;
+            break;
+          case 'geScoreValue':
+            that.selectedFields.geScoreField = fieldReferenceName;
+            break;
+          case 'riskLiklihoodValue':
+            that.selectedFields.riskLiklihoodField = fieldReferenceName;
+            break;
+          case 'riskConsequencesValue':
+            that.selectedFields.riskConsequencesField = fieldReferenceName;
+            break;
+          case 'riskScoreValue':
+            that.selectedFields.riskScoreField = fieldReferenceName;
             break;
         }
         that.updateSaveButton();
@@ -156,8 +195,9 @@ export class Settings {
   }
 
   private updateSaveButton() {
-    const buttonState = (this.selectedFields.reachField && this.selectedFields.impactField && this.selectedFields.confidenceField &&
-      this.selectedFields.effortField && this.selectedFields.riceScoreField) && this.changeMade
+    const buttonState = (this.selectedFields.ansoffMarketField && this.selectedFields.ansoffProductField && this.selectedFields.ansoffScoreField &&
+      this.selectedFields.geAttractivenessField && this.selectedFields.geBusinessStrengthField && this.selectedFields.geScoreField &&
+      this.selectedFields.riskConsequencesField && this.selectedFields.riskLiklihoodField && this.selectedFields.riskScoreField) && this.changeMade
       ? Menus.MenuItemState.None : Menus.MenuItemState.Disabled;
 
     // Update the disabled state

@@ -17,13 +17,13 @@ exec(command, {
 
   console.log(`Package created ${output.path}`);
 
-  const command = `tfx extension publish --vsix ${output.path} --no-prompt`;
-  exec(command, (error) => {
-    if (error) {
-      console.error(`Could not publish package: '${error}'`);
-      return;
-    }
+  // const command = `tfx extension publish --vsix ${output.path} --no-prompt`;
+  // exec(command, (error) => {
+  //   if (error) {
+  //     console.error(`Could not publish package: '${error}'`);
+  //     return;
+  //   }
 
-    console.log('Package published.');
-  });
+  //   console.log('Package published.');
+  // });
 });

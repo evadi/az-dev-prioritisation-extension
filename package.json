@@ -1,6 +1,6 @@
 {
   "name": "az-dev-prioritisation-extension",
-  "version": "1.0.5",
+  "version": "1.0.8",
   "description": "An Azure DevOps extension to help calculate a Business Value score for prioritising work items",
   "main": "webpack.config.js",
   "scripts": {

@@ -4,6 +4,10 @@ import { WorkItemFormService } from 'TFS/WorkItemTracking/Services';
 
 import { IStoredFieldReferences } from './stored-field-references';
 
+import Ansoff from "./matrix/ansoff";
+import Risk from "./matrix/risk";
+import GE from "./matrix/ge";
+
 function GetStoredFields() {
   const deferred = Q.defer();
   VSS.getService<IExtensionDataService>(VSS.ServiceIds.ExtensionData)
@@ -49,22 +53,28 @@ function updatePrioritisationScoreOnForm(storedFields: IStoredFieldReferences) {
                 const ansoffMarketValue = values[storedFields.ansoffMarketField];
                 const ansoffProductValue = values[storedFields.ansoffProductField];
 
-                var ansoffResult = calculateAnsoff(<string>ansoffMarketValue, <string>ansoffProductValue);
+                var ansoff = new Ansoff();
+                var ansoffResult = ansoff.calculate(<string>ansoffMarketValue, <string>ansoffProductValue);
+                var ansoffScore = ansoff.lookupScore(ansoffResult);
                 service.setFieldValue(storedFields.ansoffScoreField, ansoffResult);
 
-                const geAttractivenessValue = +values[storedFields.geAttractivenessField];
-                const geBuinessStrengthValue = +values[storedFields.geBusinessStrengthField];
+                const geAttractivenessValue = values[storedFields.geAttractivenessField];
+                const geBuinessStrengthValue = values[storedFields.geBusinessStrengthField];
                 
+                var ge = new GE();
+                var geResult = ge.calculate(<string>geAttractivenessValue, <string>geBuinessStrengthValue);
+                var geScore = ge.lookupScore(geResult);
+                service.setFieldValue(storedFields.geScoreField, geResult);
+
                 const riskLiklihoodValue = values[storedFields.riskLiklihoodField];
                 const riskConsequencesValue = values[storedFields.riskConsequencesField];
-                
-                var riskResult = calculateRisk(<string>riskLiklihoodValue, <string>riskConsequencesValue);
+
+                var risk = new Risk();
+                var riskResult = risk.calculate(<string>riskLiklihoodValue, <string>riskConsequencesValue);
+                var riskScore = risk.lookupScore(riskResult);
                 service.setFieldValue(storedFields.riskScoreField, riskResult);
                 
-                let priorityScore = 0;
-                // if (effortValue > 0) {
-                //   rice = (reachValue * impactValue * confidenceValue) / effortValue;
-                // }
+                let priorityScore = calculateScore(ansoffScore, geScore, riskScore);
 
                 service.setFieldValue(storedFields.businessValueField, priorityScore);
               });
@@ -73,46 +83,8 @@ function updatePrioritisationScoreOnForm(storedFields: IStoredFieldReferences) {
     });
 }
 
-function calculateAnsoff(market: string, products: string) {
-  var ansoffMatrix = Array(1);
-  ansoffMatrix["New"] = [];
-  ansoffMatrix["Existing"] = [];
-
-  ansoffMatrix["New"]["New"] = "[1] Diversification";
-  ansoffMatrix["New"]["Existing"] = "[3] Market Development";
-  ansoffMatrix["Existing"]["New"] = "[2] Product Development";
-  ansoffMatrix["Existing"]["Existing"] = "[4] Market Penetration or Stabalisation";
-
-  if (market && products) {
-    return ansoffMatrix[market][products];
-  }
-
-  return "";
-}
-
-function calculateRisk(likelihood: string, consequences: string) {
-  var riskMatrix = Array(2);
-  riskMatrix["Rare"] = [];
-  riskMatrix["Possible"] = [];
-  riskMatrix["Certain"] = [];
-
-  riskMatrix["Rare"]["Insignificant"] = "";
-  riskMatrix["Rare"]["Moderate"] = "";
-  riskMatrix["Rare"]["Catastrophic"] = "";
-
-  riskMatrix["Possible"]["Insignificant"] = "";
-  riskMatrix["Possible"]["Moderate"] = "";
-  riskMatrix["Possible"]["Catastrophic"] = "";
-
-  riskMatrix["Certain"]["Insignificant"] = "";
-  riskMatrix["Certain"]["Moderate"] = "";
-  riskMatrix["Certain"]["Catastrophic"] = "";
-
-  if (likelihood && consequences) {
-    return riskMatrix[likelihood][consequences];
-  }
-
-  return "";
+function calculateScore(ansoff: number, ge: number, risk: number): number {
+  return ansoff*ge*risk;
 }
 
 const formObserver = () => {

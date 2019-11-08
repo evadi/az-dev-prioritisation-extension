@@ -112,7 +112,7 @@ export class Settings {
     WIT_Client.getClient()
       .getFields()
       .then((fields: Contracts.WorkItemField[]) => {
-        this.fields = fields.filter((f: Contracts.WorkItemField) => (f.type === Contracts.FieldType.Double || f.type === Contracts.FieldType.Integer));
+        this.fields = fields;// fields.filter((f: Contracts.WorkItemField) => (f.type === Contracts.FieldType.PicklistString));
         const sortedFields = this.fields.map((f: Contracts.WorkItemField) => f.name).sort((field1, field2) => {
           if (field1 > field2)
             return 1;

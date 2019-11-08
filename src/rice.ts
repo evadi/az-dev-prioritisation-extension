@@ -46,18 +46,21 @@ function updatePrioritisationScoreOnForm(storedFields: IStoredFieldReferences) {
             matchingRiskScoreValueFields.length > 0) {
             service.getFieldValues([storedFields.ansoffMarketField, storedFields.ansoffProductField, storedFields.ansoffScoreField, storedFields.geAttractivenessField, storedFields.geBusinessStrengthField, storedFields.geScoreField, storedFields.riskConsequencesField, storedFields.riskLiklihoodField, storedFields.riskScoreField])
               .then((values) => {
-                const ansoffMarketValue = +values[storedFields.ansoffMarketField];
-                const ansoffProductValue = +values[storedFields.ansoffProductField];
-                const ansoffScoreValue = +values[storedFields.ansoffScoreField];
+                const ansoffMarketValue = values[storedFields.ansoffMarketField];
+                const ansoffProductValue = values[storedFields.ansoffProductField];
+
+                var ansoffResult = calculateAnsoff(<string>ansoffMarketValue, <string>ansoffProductValue);
+                service.setFieldValue(storedFields.ansoffScoreField, ansoffResult);
 
                 const geAttractivenessValue = +values[storedFields.geAttractivenessField];
                 const geBuinessStrengthValue = +values[storedFields.geBusinessStrengthField];
-                const geScoreValue = +values[storedFields.geScoreField];
-
-                const riskLiklihoodValue = +values[storedFields.riskLiklihoodField];
-                const riskConsequencesValue = +values[storedFields.riskConsequencesField];
-                const riskScoreValue = +values[storedFields.riskScoreField];
-
+                
+                const riskLiklihoodValue = values[storedFields.riskLiklihoodField];
+                const riskConsequencesValue = values[storedFields.riskConsequencesField];
+                
+                var riskResult = calculateRisk(<string>riskLiklihoodValue, <string>riskConsequencesValue);
+                service.setFieldValue(storedFields.riskScoreField, riskResult);
+                
                 let priorityScore = 0;
                 // if (effortValue > 0) {
                 //   rice = (reachValue * impactValue * confidenceValue) / effortValue;
@@ -68,6 +71,48 @@ function updatePrioritisationScoreOnForm(storedFields: IStoredFieldReferences) {
           }
         });
     });
+}
+
+function calculateAnsoff(market: string, products: string) {
+  var ansoffMatrix = Array(1);
+  ansoffMatrix["New"] = [];
+  ansoffMatrix["Existing"] = [];
+
+  ansoffMatrix["New"]["New"] = "[1] Diversification";
+  ansoffMatrix["New"]["Existing"] = "[3] Market Development";
+  ansoffMatrix["Existing"]["New"] = "[2] Product Development";
+  ansoffMatrix["Existing"]["Existing"] = "[4] Market Penetration or Stabalisation";
+
+  if (market && products) {
+    return ansoffMatrix[market][products];
+  }
+
+  return "";
+}
+
+function calculateRisk(likelihood: string, consequences: string) {
+  var riskMatrix = Array(2);
+  riskMatrix["Rare"] = [];
+  riskMatrix["Possible"] = [];
+  riskMatrix["Certain"] = [];
+
+  riskMatrix["Rare"]["Insignificant"] = "";
+  riskMatrix["Rare"]["Moderate"] = "";
+  riskMatrix["Rare"]["Catastrophic"] = "";
+
+  riskMatrix["Possible"]["Insignificant"] = "";
+  riskMatrix["Possible"]["Moderate"] = "";
+  riskMatrix["Possible"]["Catastrophic"] = "";
+
+  riskMatrix["Certain"]["Insignificant"] = "";
+  riskMatrix["Certain"]["Moderate"] = "";
+  riskMatrix["Certain"]["Catastrophic"] = "";
+
+  if (likelihood && consequences) {
+    return riskMatrix[likelihood][consequences];
+  }
+
+  return "";
 }
 
 const formObserver = () => {

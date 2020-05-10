@@ -12,6 +12,7 @@ export interface IStoredFieldReferences {
   riskConsequencesField: string;
   riskScoreField: string;
 
+  strategyField: string;
   businessValueField: string;
 
   // reachField: string;

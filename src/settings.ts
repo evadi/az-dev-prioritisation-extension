@@ -65,6 +65,9 @@ export class Settings {
     const riskScoreContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
     $('<label />').text('Risk Score Field').appendTo(riskScoreContainer);
 
+    const strategyContainer = $('<div />').addClass('settings-control').appendTo(riceContainer);
+    $('<label />').text('Strategically Aligned Field').appendTo(strategyContainer);
+
     VSS.getService<IExtensionDataService>(VSS.ServiceIds.ExtensionData)
       .then((dataService: IExtensionDataService) => {
         dataService.getValue<IStoredFieldReferences>('storedFields')
@@ -82,6 +85,7 @@ export class Settings {
                 riskLiklihoodField: null,
                 riskConsequencesField: null,
                 riskScoreField: null,
+                strategyField: null,
                 businessValueField: 'Microsoft.VSTS.Common.BusinessValue'
               };
             }
@@ -99,6 +103,8 @@ export class Settings {
               Controls.create(Combo, riskConsequencesContainer, this.getComboOptions('riskConsequencesValue', fieldList, this.selectedFields.riskConsequencesField));
               Controls.create(Combo, riskScoreContainer, this.getComboOptions('riskScoreValue', fieldList, this.selectedFields.riskScoreField));
 
+              Controls.create(Combo, strategyContainer, this.getComboOptions('strategyValue', fieldList, this.selectedFields.strategyField));
+
               this.updateSaveButton();
 
               VSS.notifyLoadSucceeded();
@@ -112,7 +118,7 @@ export class Settings {
     WIT_Client.getClient()
       .getFields()
       .then((fields: Contracts.WorkItemField[]) => {
-        this.fields = fields;// fields.filter((f: Contracts.WorkItemField) => (f.type === Contracts.FieldType.PicklistString));
+        this.fields = fields;
         const sortedFields = this.fields.map((f: Contracts.WorkItemField) => f.name).sort((field1, field2) => {
           if (field1 > field2)
             return 1;
@@ -167,6 +173,9 @@ export class Settings {
           case 'riskScoreValue':
             that.selectedFields.riskScoreField = fieldReferenceName;
             break;
+          case 'strategyValue':
+            that.selectedFields.strategyField = fieldReferenceName;
+            break;
         }
         that.updateSaveButton();
       }
@@ -197,7 +206,8 @@ export class Settings {
   private updateSaveButton() {
     const buttonState = (this.selectedFields.ansoffMarketField && this.selectedFields.ansoffProductField && this.selectedFields.ansoffScoreField &&
       this.selectedFields.geAttractivenessField && this.selectedFields.geBusinessStrengthField && this.selectedFields.geScoreField &&
-      this.selectedFields.riskConsequencesField && this.selectedFields.riskLiklihoodField && this.selectedFields.riskScoreField) && this.changeMade
+      this.selectedFields.riskConsequencesField && this.selectedFields.riskLiklihoodField && this.selectedFields.riskScoreField &&
+      this.selectedFields.strategyField) && this.changeMade
       ? Menus.MenuItemState.None : Menus.MenuItemState.Disabled;
 
     // Update the disabled state

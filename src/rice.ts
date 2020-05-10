@@ -42,13 +42,14 @@ function updatePrioritisationScoreOnForm(storedFields: IStoredFieldReferences) {
           const matchingRiskLiklihoodValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.riskLiklihoodField);
           const matchingRiskConsequencesValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.riskConsequencesField);
           const matchingRiskScoreValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.riskScoreField);
+          const matchingStrategyValueFields = fields.filter((f: Contracts.WorkItemField) => f.referenceName === storedFields.strategyField);
 
           if (matchingAnsoffProcutValueFields.length > 0 && matchingAnsoffMarketValueFields.length > 0 && 
             matchingAnsoffScoreValueFields.length > 0 && matchingGEAttrValueFields.length > 0 && 
             matchingGEBusinessStrengthValueFields.length > 0 && matchingGEScoreValueFields.length > 0 &&
             matchingRiskLiklihoodValueFields.length > 0 && matchingRiskConsequencesValueFields.length > 0 &&
-            matchingRiskScoreValueFields.length > 0) {
-            service.getFieldValues([storedFields.ansoffMarketField, storedFields.ansoffProductField, storedFields.ansoffScoreField, storedFields.geAttractivenessField, storedFields.geBusinessStrengthField, storedFields.geScoreField, storedFields.riskConsequencesField, storedFields.riskLiklihoodField, storedFields.riskScoreField])
+            matchingRiskScoreValueFields.length > 0 && matchingStrategyValueFields.length > 0) {
+            service.getFieldValues([storedFields.ansoffMarketField, storedFields.ansoffProductField, storedFields.ansoffScoreField, storedFields.geAttractivenessField, storedFields.geBusinessStrengthField, storedFields.geScoreField, storedFields.riskConsequencesField, storedFields.riskLiklihoodField, storedFields.riskScoreField, storedFields.strategyField])
               .then((values) => {
                 const ansoffMarketValue = values[storedFields.ansoffMarketField];
                 const ansoffProductValue = values[storedFields.ansoffProductField];
@@ -73,8 +74,10 @@ function updatePrioritisationScoreOnForm(storedFields: IStoredFieldReferences) {
                 var riskResult = risk.calculate(<string>riskLiklihoodValue, <string>riskConsequencesValue);
                 var riskScore = risk.lookupScore(riskResult);
                 service.setFieldValue(storedFields.riskScoreField, riskResult);
+
+                const strategyResult = <boolean>values[storedFields.strategyField];
                 
-                let priorityScore = calculateScore(ansoffScore, geScore, riskScore);
+                let priorityScore = calculateScore(ansoffScore, geScore, riskScore, strategyResult);
 
                 service.setFieldValue(storedFields.businessValueField, priorityScore);
               });
@@ -83,8 +86,14 @@ function updatePrioritisationScoreOnForm(storedFields: IStoredFieldReferences) {
     });
 }
 
-function calculateScore(ansoff: number, ge: number, risk: number): number {
-  return ansoff*ge*risk;
+function calculateScore(ansoff: number, ge: number, risk: number, strategy: boolean): number {
+  var val = ansoff*ge*risk;
+  
+  if (strategy) {
+    val = val < 216 ? 216 : 324;
+  }
+  
+  return val;
 }
 
 const formObserver = () => {
@@ -94,10 +103,11 @@ const formObserver = () => {
         .then((storedFields: IStoredFieldReferences) => {
           if (storedFields && storedFields.ansoffMarketField && storedFields.ansoffProductField && storedFields.ansoffScoreField && 
             storedFields.geAttractivenessField && storedFields.geBusinessStrengthField && storedFields.geScoreField && 
-            storedFields.riskLiklihoodField && storedFields.riskConsequencesField && storedFields.riskScoreField) {
+            storedFields.riskLiklihoodField && storedFields.riskConsequencesField && storedFields.riskScoreField && storedFields.strategyField) {
             if (!args.changedFields[storedFields.ansoffMarketField] || !args.changedFields[storedFields.ansoffProductField] || !args.changedFields[storedFields.ansoffScoreField] || 
               !args.changedFields[storedFields.geAttractivenessField] || !args.changedFields[storedFields.geBusinessStrengthField] || !args.changedFields[storedFields.geScoreField] ||
-                !args.changedFields[storedFields.riskLiklihoodField] || !args.changedFields[storedFields.riskConsequencesField] || !args.changedFields[storedFields.riskScoreField]) {
+                !args.changedFields[storedFields.riskLiklihoodField] || !args.changedFields[storedFields.riskConsequencesField] || !args.changedFields[storedFields.riskScoreField] ||
+                !args.changedFields[storedFields.strategyField]) {
               updatePrioritisationScoreOnForm(storedFields);
             }
           } else {
@@ -113,7 +123,7 @@ const formObserver = () => {
         .then((storedFields: IStoredFieldReferences) => {
           if (storedFields && storedFields.ansoffMarketField && storedFields.ansoffProductField && storedFields.ansoffScoreField && 
             storedFields.geAttractivenessField && storedFields.geBusinessStrengthField && storedFields.geScoreField && 
-            storedFields.riskLiklihoodField && storedFields.riskConsequencesField && storedFields.riskScoreField) {
+            storedFields.riskLiklihoodField && storedFields.riskConsequencesField && storedFields.riskScoreField && storedFields.strategyField) {
             updatePrioritisationScoreOnForm(storedFields);
           } else {
             console.log('Unable to calculate Prioritisation Score, please configure fields on the collection settings page.');
